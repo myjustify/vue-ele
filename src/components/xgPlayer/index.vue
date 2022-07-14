@@ -1,7 +1,7 @@
 <template>
   <div
-      :class="[ comName ]"
-      :style="{ width: '100%', height: '100%', ...customStyle }"
+    :class="[ comName ]"
+    :style="{ width: '100%', height: '100%', ...customStyle }"
   >
     <div ref="xgRef" />
   </div>
@@ -35,7 +35,7 @@ xgPlayer.install(timeoutPlugin.name, timeoutPlugin.method)
 xgPlayer.install(errorPlugin.name, errorPlugin.method)
 
 export default {
-  name: 'xgPlayer',
+  name: 'XgPlayer',
   props: {
     customStyle: {
       type: Object,

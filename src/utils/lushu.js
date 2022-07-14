@@ -16,7 +16,7 @@ export default function lushuMixin(refName = 'lushu', lushuObj = 'lushu') {
           iconPoint:
             {
               url: 'http://api.map.baidu.com/library/LuShu/1.2/examples/car.png',
-              size: {width: 41, height: 23}
+              size: { width: 41, height: 23 }
             },
           startIndex: 0,
           isEnded: false,
@@ -59,7 +59,7 @@ export default function lushuMixin(refName = 'lushu', lushuObj = 'lushu') {
       [lushuObj + 'Start']() {
         const lushuRef = this.$refs[refName]
         const originInstance = lushuRef.originInstance
-        originInstance._addMarker = function () {
+        originInstance._addMarker = function() {
           if (originInstance._marker) {
             originInstance.stop()
             originInstance._map.removeOverlay(originInstance._marker)

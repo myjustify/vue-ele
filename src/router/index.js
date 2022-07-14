@@ -1,8 +1,8 @@
 import vueRouter from 'vue-router'
 import Vue from 'vue'
-import tree  from "@/views/tree"
-import timeLine from "@/views/timeLine"
-import timeLineNew from "@/views/timeLineNew"
+import tree from '@/views/tree'
+import timeLine from '@/views/timeLine'
+import timeLineNew from '@/views/timeLineNew'
 Vue.use(vueRouter)
 
 const routes = [
@@ -43,7 +43,7 @@ const routes = [
   }
 ]
 
-function createRoutes () {
+function createRoutes() {
   return new vueRouter({
     // mode: 'history',
     routes

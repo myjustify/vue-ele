@@ -1,9 +1,17 @@
 <template>
-  <div class="g-scroll-bar"
-       :class="{'g-scroll-bar--vertical': vertical,
-       'g-scroll-bar--horizontal': !vertical}">
-    <div class="g-scroll-bar__bar" :style="barStyle">
-      <div class="g-scroll-bar__thumb" :style="thumbStyle"></div>
+  <div
+    class="g-scroll-bar"
+    :class="{'g-scroll-bar--vertical': vertical,
+             'g-scroll-bar--horizontal': !vertical}"
+  >
+    <div
+      class="g-scroll-bar__bar"
+      :style="barStyle"
+    >
+      <div
+        class="g-scroll-bar__thumb"
+        :style="thumbStyle"
+      />
     </div>
   </div>
 </template>

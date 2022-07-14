@@ -8,8 +8,8 @@
 <script>
 import TimeLine from '@/views/timeLineNew/timeLine'
 export default {
-  name: 'time-line-new-view',
-  components: {TimeLine},
+  name: 'TimeLineNewView',
+  components: { TimeLine },
   data() {
     return {
       time: '00:00'

@@ -1,27 +1,27 @@
 <template>
   <div class="tree">
     <el-input
-        placeholder="输入关键字进行过滤"
-        v-model="filterText">
-    </el-input>
+      v-model="filterText"
+      placeholder="输入关键字进行过滤"
+    />
 
     <div class="el-row--flex">
       <div class="tree-box">
         <gr-tree
-            ref="grTree"
-            height='100%'
-            :el-ref.sync="tree.ref"
-            :data="tree.data"
-            :default-expanded-keys.sync="tree.defaultExpandedKeys"
-            show-checkbox
-            :node-key="tree.nodeKey"
-            :default-expand-all="tree.defaultExpandAll"
-            :props="tree.defaultProps"
-            :filter-node-method="tree.filterNodeMethod"
-            :lazy="tree.lazy"
-            :load="tree.load"
-            @check="check"
-            @check-change="checkChange"
+          ref="grTree"
+          height="100%"
+          :el-ref.sync="tree.ref"
+          :data="tree.data"
+          :default-expanded-keys.sync="tree.defaultExpandedKeys"
+          show-checkbox
+          :node-key="tree.nodeKey"
+          :default-expand-all="tree.defaultExpandAll"
+          :props="tree.defaultProps"
+          :filter-node-method="tree.filterNodeMethod"
+          :lazy="tree.lazy"
+          :load="tree.load"
+          @check="check"
+          @check-change="checkChange"
         >
           <template slot-scope="{ node, data }">
             <div>
@@ -45,8 +45,8 @@ import { cloneDeep } from 'lodash-es'
 import GrTree from '@/components/GrTree'
 
 export default {
-  name: "test-tree",
-  components: {GrTree},
+  name: 'TestTree',
+  components: { GrTree },
   data() {
     return {
       tree: {
@@ -70,7 +70,7 @@ export default {
         },
         lazy: false,
         load(node, resolve) {
-          if(node.level === 0) {
+          if (node.level === 0) {
             return resolve(node.data)
           } else {
             resolve(node.data.children || [])
@@ -96,7 +96,7 @@ export default {
         }
       },
       filterText: ''
-    };
+    }
   },
   computed: {
     grTree() {
@@ -106,18 +106,18 @@ export default {
   watch: {
     filterText(val) {
       this.grTree.defaultExpandedKeysTemp = []
-      this.tree.ref.filter(val);
+      this.tree.ref.filter(val)
     }
   },
   created() {
-    console.log('test-tree created');
+    console.log('test-tree created')
   },
   mounted() {
     function traverse(data, callback) {
-      data.forEach(item => {  // 0.426025390625 ms
-        callback && callback(item);
+      data.forEach(item => { // 0.426025390625 ms
+        callback && callback(item)
         if (item.children) {
-          traverse(item.children, callback);
+          traverse(item.children, callback)
         }
       })
 
@@ -128,11 +128,11 @@ export default {
       //   }
       // }
     }
-    console.time('test-tree');
+    console.time('test-tree')
     traverse(treeData, (item) => {
       item.id = item.frontKey
-    });
-    console.timeEnd('test-tree');
+    })
+    console.timeEnd('test-tree')
     console.log(treeData)
     this.tree.data = treeData
   },
@@ -190,7 +190,7 @@ export default {
     },
     getCheckedNodes() {
       // 1. 是否只是叶子节点，默认值为 false 2. 是否包含半选节点，默认值为 false
-      const leafOnly= false, includeHalfChecked = false
+      const leafOnly = false; const includeHalfChecked = false
       console.log(this.tree.ref.getCheckedNodes(leafOnly, includeHalfChecked))
     },
     getCheckedKeys() {

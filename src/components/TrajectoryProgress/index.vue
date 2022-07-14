@@ -1,26 +1,42 @@
 <template>
   <div :class="[ comName ]">
-    <gr-slider v-bind="$attrs" :step="0.1" v-on="$listeners"/>
+    <gr-slider
+      v-bind="$attrs"
+      :step="0.1"
+      v-on="$listeners"
+    />
     <div class="operate">
       <div class="totalDis">
         总里程(≈): {{ totalDis }} Km
       </div>
 
       <div class="control el-row--flex is-align-middle is-justify-space-between">
-        <div style="width: 14px; height: 20px;" class="el-row--flex is-align-middle is-justify-center">
+        <div
+          style="width: 14px; height: 20px;"
+          class="el-row--flex is-align-middle is-justify-center"
+        >
           <el-image
             :src="require('@/assets/TrajectoryProgress/pre.png')"
             @click="decSpeed"
           />
         </div>
-        <div style="width: 30px; height: 30px;" class="el-row--flex is-align-middle is-justify-center">
+        <div
+          style="width: 30px; height: 30px;"
+          class="el-row--flex is-align-middle is-justify-center"
+        >
           <el-image
             :src="play ? require('@/assets/TrajectoryProgress/play.png'): require('@/assets/TrajectoryProgress/pause.png')"
             @click="toggle"
           />
         </div>
-        <div style="width: 14px; height: 20px;" class="el-row--flex is-align-middle is-justify-center">
-          <el-image :src="require('@/assets/TrajectoryProgress/next.png')" @click="incSpeed" />
+        <div
+          style="width: 14px; height: 20px;"
+          class="el-row--flex is-align-middle is-justify-center"
+        >
+          <el-image
+            :src="require('@/assets/TrajectoryProgress/next.png')"
+            @click="incSpeed"
+          />
         </div>
 
         <div
@@ -37,7 +53,7 @@
 import { debounce } from 'lodash-es'
 
 export default {
-  name: 'trajectory-progress',
+  name: 'TrajectoryProgress',
   props: {
     totalDis: {
       type: [Number, String],

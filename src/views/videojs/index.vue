@@ -1,14 +1,18 @@
 <template>
   <div>
-<!--    想让video标签 自动播放 视频，必须先设置为静音。-->
-    <video muted ref="videoPlayer" class="video-js"></video>
+    <!--    想让video标签 自动播放 视频，必须先设置为静音。-->
+    <video
+      ref="videoPlayer"
+      muted
+      class="video-js"
+    />
   </div>
 </template>
 
 <script>
-import videojs from 'video.js';
-import 'flv.js';
-import 'videojs-flvjs-es6';
+import videojs from 'video.js'
+import 'flv.js'
+import 'videojs-flvjs-es6'
 export default {
   name: 'VideoPlayer',
   props: {
@@ -19,16 +23,16 @@ export default {
           autoplay: true,
           controls: true,
           // liveui: true,
-          techOrder:[ 'html5', 'flvjs' ],
+          techOrder: ['html5', 'flvjs'],
           sources: [ // https://www.runoob.com/http/mime-types.html
             // {
             //   src: 'http://adas.wbtech.com/file//data/alarmFile/dailyVideo/20220626/50674/192180671993_01_22062610.ts.mp4',
             //   // type: 'video/mp4'
             // },
             {
-              src: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni4934e7b/c4d93960-5643-11eb-a16f-5b3e54966275.m3u8',
+              src: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni4934e7b/c4d93960-5643-11eb-a16f-5b3e54966275.m3u8'
               // type: 'application/vnd.apple.mpegurl'
-            },
+            }
             // { // 实时视频
             //   src: 'https://live.cloud.xstrive.com/hdl/_liveXsw_1/4c684e2a202e5203b0b31a57e0b0f6de.flv',
             //   type: 'video/x-flv' // flv
@@ -48,7 +52,7 @@ export default {
               duration: 1
             }
           }
-        };
+        }
       }
     }
   },
@@ -69,23 +73,23 @@ export default {
     // })
     console.log(videojs.url.parseUrl(this.options.sources[0].src), videojs.url.getFileExtension(this.options.sources[0].src))
     this.player = videojs(this.$refs.videoPlayer, this.options, () => {
-      this.player.log('onPlayerReady', this);
+      this.player.log('onPlayerReady', this)
       this.player.on('ended', () => {
         console.log('播放结束')
-        this.player.pause();
-      });
+        this.player.pause()
+      })
       this.player.on('error', () => {
         console.log('error')
         // this.player.pause();
-      });
+      })
       this.player.on('pause', () => {
         console.log('pause')
-        this.player.currentTime(0);
-      });
+        this.player.currentTime(0)
+      })
       this.player.on('play', () => {
         // this.player.currentTime(0);
         console.log('play')
-      });
+      })
       this.player.on('ready', () => {
         // setTimeout(() => {
         //   const PlayToggle = videojs.getComponent('PlayToggle')
@@ -94,12 +98,12 @@ export default {
         //     btn.handleClick()
         //   }
         // }, 100)
-      });
+      })
     })
   },
   beforeDestroy() {
     if (this.player) {
-      this.player.dispose();
+      this.player.dispose()
     }
   }
 }

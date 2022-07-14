@@ -17,7 +17,7 @@
     :aria-checked="node.checked"
     :draggable="tree.draggable"
     @click.stop="handleClick"
-    @contextmenu="$event => this.handleContextMenu($event)"
+    @contextmenu="$event => handleContextMenu($event)"
     @dragstart.stop="handleDragStart"
     @dragover.stop="handleDragOver"
     @dragend.stop="handleDragEnd"
@@ -37,7 +37,7 @@
           tree.iconClass ? tree.iconClass : 'el-icon-caret-right'
         ]"
         @click.stop="handleExpandIconClick"
-      ></span>
+      />
       <el-checkbox
         v-if="showCheckbox"
         v-model="node.checked"
@@ -45,12 +45,12 @@
         :disabled="!!node.disabled"
         @click.native.stop
         @change="handleCheckChange"
-      ></el-checkbox>
+      />
       <span
         v-if="node.loading"
         class="el-tree-node__loading-icon el-icon-loading"
-      ></span>
-      <node-content :node="node"></node-content>
+      />
+      <node-content :node="node" />
     </div>
     <el-collapse-transition>
       <div
@@ -68,22 +68,22 @@
           :show-checkbox="showCheckbox"
           :node="child"
           @node-expand="handleChildNodeExpand"
-        ></el-tree-node>
+        />
       </div>
     </el-collapse-transition>
   </div>
 </template>
 
 <script type="text/jsx">
-import ElCollapseTransition from "./transitions/collapse-transition";
-import ElCheckbox from "./packages/checkbox";
-import emitter from "./mixins/emitter";
-import commonMethods from "./mixins/common-methods";
+import ElCollapseTransition from './transitions/collapse-transition'
+import ElCheckbox from './packages/checkbox'
+import emitter from './mixins/emitter'
+import commonMethods from './mixins/common-methods'
 
 export default {
-  name: "ElTreeNode",
+  name: 'ElTreeNode',
 
-  componentName: "ElTreeNode",
+  componentName: 'ElTreeNode',
 
   components: {
     ElCollapseTransition,
@@ -95,10 +95,10 @@ export default {
         }
       },
       render(h) {
-        const parent = this.$parent;
-        const tree = parent.tree;
-        const node = this.node;
-        const { data, store } = node;
+        const parent = this.$parent
+        const tree = parent.tree
+        const node = this.node
+        const { data, store } = node
         return parent.renderContent ? (
           parent.renderContent.call(parent._renderProxy, h, {
             _self: tree.$vnode.context,
@@ -109,8 +109,8 @@ export default {
         ) : tree.$scopedSlots.default ? (
           tree.$scopedSlots.default({ node, data })
         ) : (
-          <span class="el-tree-node__label">{node.label}</span>
-        );
+          <span class='el-tree-node__label'>{node.label}</span>
+        )
       }
     }
   },
@@ -121,13 +121,13 @@ export default {
     node: {
       type: Object,
       default() {
-        return {};
+        return {}
       }
     },
     props: {
       type: Object,
       default() {
-        return {};
+        return {}
       }
     },
     renderContent: Function,
@@ -148,31 +148,31 @@ export default {
       childNodeRendered: false,
       oldChecked: null,
       oldIndeterminate: null
-    };
+    }
   },
 
   watch: {
-    "node.indeterminate"(val) {
-      this.handleSelectChange(this.node.checked, val);
+    'node.indeterminate'(val) {
+      this.handleSelectChange(this.node.checked, val)
     },
 
-    "node.checked"(val) {
-      this.handleSelectChange(val, this.node.indeterminate);
+    'node.checked'(val) {
+      this.handleSelectChange(val, this.node.indeterminate)
     },
 
-    "node.expanded"(val) {
-      this.$nextTick(() => (this.expanded = val));
+    'node.expanded'(val) {
+      this.$nextTick(() => (this.expanded = val))
       // this.expanded;
       if (val) {
-        this.childNodeRendered = true;
+        this.childNodeRendered = true
       }
     }
   },
 
-  methods: {},
-
   created() {
-    this.init(this.$parent);
-  }
-};
+    this.init(this.$parent)
+  },
+
+  methods: {}
+}
 </script>

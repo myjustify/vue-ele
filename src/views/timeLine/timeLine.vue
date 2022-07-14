@@ -1,43 +1,47 @@
 <template>
   <div
-      ref="timeLine"
-      v-mousewheel="timeLineMousewheel"
-      class="timeLine"
-      style="margin-top: 20px; user-select: none;"
+    ref="timeLine"
+    v-mousewheel="timeLineMousewheel"
+    class="timeLine"
+    style="margin-top: 20px; user-select: none;"
   >
-<!--    <div class="currentLine" />-->
-    <div class="allLine" :style="[ calcAllLineStyle ]">
-      <div v-for="(item) in timeArr" :key="item" class="item">
+    <!--    <div class="currentLine" />-->
+    <div
+      class="allLine"
+      :style="[ calcAllLineStyle ]"
+    >
+      <div
+        v-for="(item) in timeArr"
+        :key="item"
+        class="item"
+      >
         {{ item }}
         <div class="minute">
           <template v-for="(son) in timeItemObj[item]">
             <div
-                :key="son.value"
-                class="minute-item"
-                :class="{ active: son.active, currentActive: son.value === value }"
-                @click="timeLineClick(son)"
+              :key="son.value"
+              class="minute-item"
+              :class="{ active: son.active, currentActive: son.value === value }"
+              @click="timeLineClick(son)"
             />
           </template>
         </div>
       </div>
     </div>
     <div class="viewTimeBox">
-      <div class="viewTime" :style="calcViewTimeStyle">{{ value }}</div>
+      <div
+        class="viewTime"
+        :style="calcViewTimeStyle"
+      >{{ value }}</div>
     </div>
   </div>
 </template>
 <script>
 import Mousewheel from 'element-ui/lib/directives/mousewheel'
 export default {
-  name: 'timeLine',
+  name: 'TimeLine',
   directives: {
     Mousewheel
-  },
-  created() {
-    console.log('timeLine created')
-  },
-  mounted() {
-    console.log('timeLine mounted')
   },
   props: {
     value: {
@@ -109,6 +113,12 @@ export default {
         width: this.calcAllLineLong + 'px'
       }
     }
+  },
+  created() {
+    console.log('timeLine created')
+  },
+  mounted() {
+    console.log('timeLine mounted')
   },
   methods: {
     timeLineClick({ value }) {

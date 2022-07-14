@@ -1,19 +1,22 @@
 <template>
   <div :class="[ comName ]">
     <vue-easy-tree
-        ref="tree"
-        class="gr-tree-main"
-        :node-key="nodeKey"
-        :props="$attrs.props || defaultProps"
-        :auto-expand-parent="false"
-        :default-expanded-keys="defaultExpandedKeys"
-        v-bind="$attrs"
-        v-on="$listeners"
-        @node-expand="nodeExpand"
-        @node-collapse="nodeCollapse"
+      ref="tree"
+      class="gr-tree-main"
+      :node-key="nodeKey"
+      :props="$attrs.props || defaultProps"
+      :auto-expand-parent="false"
+      :default-expanded-keys="defaultExpandedKeys"
+      v-bind="$attrs"
+      v-on="$listeners"
+      @node-expand="nodeExpand"
+      @node-collapse="nodeCollapse"
     >
       <template slot-scope="{ node, data }">
-        <slot :node="node" :data="data">
+        <slot
+          :node="node"
+          :data="data"
+        >
           <template v-if="!$scopedSlots.default">
             {{ node[$attrs.props.label] || node[defaultProps.label] }}
           </template>
@@ -27,7 +30,7 @@
 <script>
 import VueEasyTree from '@/components/vueEasyTree'
 export default {
-  name: 'gr-tree',
+  name: 'GrTree',
   components: {
     VueEasyTree
   },

@@ -11,6 +11,7 @@
   >
     <RecycleScroller
       v-if="height && !isEmpty"
+      v-slot="{ active,item }"
       :style="{
         width: offsetWidth || width,
         height: height,
@@ -21,14 +22,13 @@
       :items="dataList"
       :item-size="26"
       :buffer="50"
-      v-slot="{ active,item }"
     >
       <ElTreeVirtualNode
         v-if="active"
         style="height: 26px;"
         :node="item"
-        :renderContent="renderContent"
-        :showCheckbox="showCheckbox"
+        :render-content="renderContent"
+        :show-checkbox="showCheckbox"
         :render-after-expand="renderAfterExpand"
         @node-expand="handleNodeExpand"
         @changeWidth="changeWidth"
@@ -44,30 +44,33 @@
       :render-content="renderContent"
       :render-after-expand="renderAfterExpand"
       @node-expand="handleNodeExpand"
-    ></el-tree-node>
-    <div v-if="isEmpty" class="el-tree__empty-block">
+    />
+    <div
+      v-if="isEmpty"
+      class="el-tree__empty-block"
+    >
       <span class="el-tree__empty-text">{{ emptyText }}</span>
     </div>
     <div
       v-show="dragState.showDropIndicator"
       ref="dropIndicator"
       class="el-tree__drop-indicator"
-    ></div>
+    />
   </div>
 </template>
 
 <script>
-import TreeStore from "./model/tree-store";
-import { RecycleScroller } from "vue-virtual-scroller";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
-import { getNodeKey, findNearestComponent } from "./model/util";
-import ElTreeNode from "./tree-node.vue";
-import ElTreeVirtualNode from "./virtual-tree-node.vue";
-import emitter from "./mixins/emitter";
-import { addClass, removeClass } from "./utils/dom";
+import TreeStore from './model/tree-store'
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { getNodeKey, findNearestComponent } from './model/util'
+import ElTreeNode from './tree-node.vue'
+import ElTreeVirtualNode from './virtual-tree-node.vue'
+import emitter from './mixins/emitter'
+import { addClass, removeClass } from './utils/dom'
 
 export default {
-  name: "VueEasyTree",
+  name: 'VueEasyTree',
 
   components: {
     // VirtualList,
@@ -80,7 +83,7 @@ export default {
   props: {
     width: {
       type: [String],
-      default: "auto"
+      default: 'auto'
     },
     data: {
       type: Array
@@ -88,7 +91,7 @@ export default {
     emptyText: {
       type: String,
       default() {
-        return "暂无数据";
+        return '暂无数据'
       }
     },
     renderAfterExpand: {
@@ -129,10 +132,10 @@ export default {
     props: {
       default() {
         return {
-          children: "children",
-          label: "label",
-          disabled: "disabled"
-        };
+          children: 'children',
+          label: 'label',
+          disabled: 'disabled'
+        }
       }
     },
     lazy: {
@@ -175,261 +178,71 @@ export default {
         dropNode: null,
         allowDrop: true
       },
-      treeNodeName: this.height ? "ElTreeVirtualNode" : "ElTreeNode",
+      treeNodeName: this.height ? 'ElTreeVirtualNode' : 'ElTreeNode',
       offsetWidth: '0px'
-    };
+    }
   },
 
   computed: {
     children: {
       set(value) {
-        this.data = value;
+        this.data = value
       },
       get() {
-        return this.data;
+        return this.data
       }
     },
 
     treeItemArray() {
-      return Array.prototype.slice.call(this.treeItems);
+      return Array.prototype.slice.call(this.treeItems)
     },
 
     isEmpty() {
-      const { childNodes } = this.root;
+      const { childNodes } = this.root
       return (
         !childNodes ||
         childNodes.length === 0 ||
         childNodes.every(({ visible }) => !visible)
-      );
+      )
     },
 
     dataList() {
-      const a = this.smoothTree(this.root.childNodes);
-      const b = [];
+      const a = this.smoothTree(this.root.childNodes)
+      const b = []
       a.forEach(e => {
-        b.push(e.key);
-      });
-      return a;
+        b.push(e.key)
+      })
+      return a
     }
   },
 
   watch: {
     defaultCheckedKeys(newVal) {
-      this.store.setDefaultCheckedKey(newVal);
+      this.store.setDefaultCheckedKey(newVal)
     },
 
     defaultExpandedKeys(newVal) {
-      this.store.defaultExpandedKeys = newVal;
-      this.store.setDefaultExpandedKeys(newVal);
+      this.store.defaultExpandedKeys = newVal
+      this.store.setDefaultExpandedKeys(newVal)
     },
 
     data(newVal) {
-      this.store.setData(newVal);
+      this.store.setData(newVal)
     },
 
     checkboxItems(val) {
       Array.prototype.forEach.call(val, checkbox => {
-        checkbox.setAttribute("tabindex", -1);
-      });
+        checkbox.setAttribute('tabindex', -1)
+      })
     },
 
     checkStrictly(newVal) {
-      this.store.checkStrictly = newVal;
-    }
-  },
-
-  methods: {
-    changeWidth(e) {
-      const offsetWidth = +(this.offsetWidth.replace(/px/g, ''))
-      if(e > offsetWidth) {
-        this.offsetWidth = e + 34 + 'px';
-      }
-    },
-    smoothTree(treeData) {
-      return treeData.reduce((smoothArr, data) => {
-        if (data.visible) {
-          // Mark different types to avoid being optimized out when assembled into the same dom
-          data.type = this.showCheckbox
-            ? `${data.level}-${data.checked}-${data.indeterminate}`
-            : `${data.level}-${data.expanded}`;
-          smoothArr.push(data);
-        }
-        if (data.expanded && data.childNodes.length) {
-          smoothArr.push(...this.smoothTree(data.childNodes));
-        }
-
-        return smoothArr;
-      }, []);
-    },
-    filter(value) {
-      if (!this.filterNodeMethod)
-        throw new Error("[Tree] filterNodeMethod is required when filter");
-      this.store.filter(value);
-    },
-
-    getNodeKey(node) {
-      return getNodeKey(this.nodeKey, node.data);
-    },
-
-    getNodePath(data) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in getNodePath");
-      const node = this.store.getNode(data);
-      if (!node) return [];
-      const path = [node.data];
-      let parent = node.parent;
-      while (parent && parent !== this.root) {
-        path.push(parent.data);
-        parent = parent.parent;
-      }
-      return path.reverse();
-    },
-
-    getCheckedNodes(leafOnly, includeHalfChecked) {
-      return this.store.getCheckedNodes(leafOnly, includeHalfChecked);
-    },
-
-    getCheckedKeys(leafOnly) {
-      return this.store.getCheckedKeys(leafOnly);
-    },
-
-    getCurrentNode() {
-      const currentNode = this.store.getCurrentNode();
-      return currentNode ? currentNode.data : null;
-    },
-
-    getCurrentKey() {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in getCurrentKey");
-      const currentNode = this.getCurrentNode();
-      return currentNode ? currentNode[this.nodeKey] : null;
-    },
-
-    setCheckedNodes(nodes, leafOnly) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in setCheckedNodes");
-      this.store.setCheckedNodes(nodes, leafOnly);
-    },
-
-    setCheckedKeys(keys, leafOnly) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in setCheckedKeys");
-      this.store.setCheckedKeys(keys, leafOnly);
-    },
-
-    setChecked(data, checked, deep) {
-      this.store.setChecked(data, checked, deep);
-    },
-
-    setCheckedAll(checked = true) {
-      this.store.setCheckedAll(checked);
-    },
-
-    getHalfCheckedNodes() {
-      return this.store.getHalfCheckedNodes();
-    },
-
-    getHalfCheckedKeys() {
-      return this.store.getHalfCheckedKeys();
-    },
-
-    setCurrentNode(node) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in setCurrentNode");
-      this.store.setUserCurrentNode(node);
-    },
-
-    setCurrentKey(key) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in setCurrentKey");
-      this.store.setCurrentNodeKey(key);
-    },
-
-    getNode(data) {
-      return this.store.getNode(data);
-    },
-
-    remove(data) {
-      this.store.remove(data);
-    },
-
-    append(data, parentNode) {
-      this.store.append(data, parentNode);
-    },
-
-    insertBefore(data, refNode) {
-      this.store.insertBefore(data, refNode);
-    },
-
-    insertAfter(data, refNode) {
-      this.store.insertAfter(data, refNode);
-    },
-
-    handleNodeExpand(nodeData, node, instance) {
-      this.broadcast(this.treeNodeName, "tree-node-expand", node);
-      this.$emit("node-expand", nodeData, node, instance);
-    },
-
-    updateKeyChildren(key, data) {
-      if (!this.nodeKey)
-        throw new Error("[Tree] nodeKey is required in updateKeyChild");
-      this.store.updateChildren(key, data);
-    },
-
-    initTabIndex() {
-      this.treeItems = this.$el.querySelectorAll(
-        ".is-focusable[role=treeitem]"
-      );
-      this.checkboxItems = this.$el.querySelectorAll("input[type=checkbox]");
-      const checkedItem = this.$el.querySelectorAll(
-        ".is-checked[role=treeitem]"
-      );
-      if (checkedItem.length) {
-        checkedItem[0].setAttribute("tabindex", 0);
-        return;
-      }
-      this.treeItems[0] && this.treeItems[0].setAttribute("tabindex", 0);
-    },
-
-    handleKeydown(ev) {
-      const currentItem = ev.target;
-      if (currentItem.className.indexOf("el-tree-node") === -1) return;
-      const keyCode = ev.keyCode;
-      this.treeItems = this.$el.querySelectorAll(
-        ".is-focusable[role=treeitem]"
-      );
-      const currentIndex = this.treeItemArray.indexOf(currentItem);
-      let nextIndex;
-      if ([38, 40].indexOf(keyCode) > -1) {
-        // up、down
-        ev.preventDefault();
-        if (keyCode === 38) {
-          // up
-          nextIndex = currentIndex !== 0 ? currentIndex - 1 : 0;
-        } else {
-          nextIndex =
-            currentIndex < this.treeItemArray.length - 1 ? currentIndex + 1 : 0;
-        }
-        this.treeItemArray[nextIndex].focus(); // 选中
-      }
-      // 始终使用箭头，避免expand-on-click-node=false时不展开
-      const expandIcon = currentItem.querySelector('[class*="el-icon-"]');
-      if ([37, 39].indexOf(keyCode) > -1 && expandIcon) {
-        // left、right 展开
-        ev.preventDefault();
-        expandIcon.click(); // 选中
-      }
-      const hasInput = currentItem.querySelector('[type="checkbox"]');
-      if ([13, 32].indexOf(keyCode) > -1 && hasInput) {
-        // space enter选中checkbox
-        ev.preventDefault();
-        hasInput.click();
-      }
+      this.store.checkStrictly = newVal
     }
   },
 
   created() {
-    this.isTree = true;
+    this.isTree = true
 
     this.store = new TreeStore({
       key: this.nodeKey,
@@ -445,211 +258,393 @@ export default {
       autoExpandParent: this.autoExpandParent,
       defaultExpandAll: this.defaultExpandAll,
       filterNodeMethod: this.filterNodeMethod
-    });
+    })
 
-    this.root = this.store.root;
+    this.root = this.store.root
 
-    let dragState = this.dragState;
+    const dragState = this.dragState
 
-    this.$on("tree-node-drag-start", (event, treeNode) => {
+    this.$on('tree-node-drag-start', (event, treeNode) => {
       if (
-        typeof this.allowDrag === "function" &&
+        typeof this.allowDrag === 'function' &&
         !this.allowDrag(treeNode.node)
       ) {
-        event.preventDefault();
-        return false;
+        event.preventDefault()
+        return false
       }
-      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.effectAllowed = 'move'
 
       // wrap in try catch to address IE's error when first param is 'text/plain'
       try {
         // setData is required for draggable to work in FireFox
         // the content has to be '' so dragging a node out of the tree won't open a new tab in FireFox
-        event.dataTransfer.setData("text/plain", "");
+        event.dataTransfer.setData('text/plain', '')
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
-      dragState.draggingNode = treeNode;
-      this.$emit("node-drag-start", treeNode.node, event);
-    });
+      dragState.draggingNode = treeNode
+      this.$emit('node-drag-start', treeNode.node, event)
+    })
 
-    this.$on("tree-node-drag-over", (event, treeNode) => {
+    this.$on('tree-node-drag-over', (event, treeNode) => {
       const dropNode = findNearestComponent(
         event.target,
         treeNode.$options.name
-      );
-      const oldDropNode = dragState.dropNode;
+      )
+      const oldDropNode = dragState.dropNode
       if (oldDropNode && oldDropNode !== dropNode) {
-        removeClass(oldDropNode.$el, "is-drop-inner");
+        removeClass(oldDropNode.$el, 'is-drop-inner')
       }
-      const draggingNode = dragState.draggingNode;
-      if (!draggingNode || !dropNode) return;
+      const draggingNode = dragState.draggingNode
+      if (!draggingNode || !dropNode) return
 
-      let dropPrev = true;
-      let dropInner = true;
-      let dropNext = true;
-      let userAllowDropInner = true;
-      if (typeof this.allowDrop === "function") {
-        dropPrev = this.allowDrop(draggingNode.node, dropNode.node, "prev");
+      let dropPrev = true
+      let dropInner = true
+      let dropNext = true
+      let userAllowDropInner = true
+      if (typeof this.allowDrop === 'function') {
+        dropPrev = this.allowDrop(draggingNode.node, dropNode.node, 'prev')
         userAllowDropInner = dropInner = this.allowDrop(
           draggingNode.node,
           dropNode.node,
-          "inner"
-        );
-        dropNext = this.allowDrop(draggingNode.node, dropNode.node, "next");
+          'inner'
+        )
+        dropNext = this.allowDrop(draggingNode.node, dropNode.node, 'next')
       }
-      event.dataTransfer.dropEffect = dropInner ? "move" : "none";
+      event.dataTransfer.dropEffect = dropInner ? 'move' : 'none'
       if ((dropPrev || dropInner || dropNext) && oldDropNode !== dropNode) {
         if (oldDropNode) {
           this.$emit(
-            "node-drag-leave",
+            'node-drag-leave',
             draggingNode.node,
             oldDropNode.node,
             event
-          );
+          )
         }
-        this.$emit("node-drag-enter", draggingNode.node, dropNode.node, event);
+        this.$emit('node-drag-enter', draggingNode.node, dropNode.node, event)
       }
 
       if (dropPrev || dropInner || dropNext) {
-        dragState.dropNode = dropNode;
+        dragState.dropNode = dropNode
       }
 
       if (dropNode.node.nextSibling === draggingNode.node) {
-        dropNext = false;
+        dropNext = false
       }
       if (dropNode.node.previousSibling === draggingNode.node) {
-        dropPrev = false;
+        dropPrev = false
       }
       if (dropNode.node.contains(draggingNode.node, false)) {
-        dropInner = false;
+        dropInner = false
       }
       if (
         draggingNode.node === dropNode.node ||
         draggingNode.node.contains(dropNode.node)
       ) {
-        dropPrev = false;
-        dropInner = false;
-        dropNext = false;
+        dropPrev = false
+        dropInner = false
+        dropNext = false
       }
 
-      const targetPosition = dropNode.$el.getBoundingClientRect();
-      const treePosition = this.$el.getBoundingClientRect();
+      const targetPosition = dropNode.$el.getBoundingClientRect()
+      const treePosition = this.$el.getBoundingClientRect()
 
-      let dropType;
+      let dropType
       const prevPercent = dropPrev
         ? dropInner
           ? 0.25
           : dropNext
-          ? 0.45
-          : 1
-        : -1;
+            ? 0.45
+            : 1
+        : -1
       const nextPercent = dropNext
         ? dropInner
           ? 0.75
           : dropPrev
-          ? 0.55
-          : 0
-        : 1;
+            ? 0.55
+            : 0
+        : 1
 
-      let indicatorTop = -9999;
-      const distance = event.clientY - targetPosition.top;
+      let indicatorTop = -9999
+      const distance = event.clientY - targetPosition.top
       if (distance < targetPosition.height * prevPercent) {
-        dropType = "before";
+        dropType = 'before'
       } else if (distance > targetPosition.height * nextPercent) {
-        dropType = "after";
+        dropType = 'after'
       } else if (dropInner) {
-        dropType = "inner";
+        dropType = 'inner'
       } else {
-        dropType = "none";
+        dropType = 'none'
       }
 
       const iconPosition = dropNode.$el
-        .querySelector(".el-tree-node__expand-icon")
-        .getBoundingClientRect();
-      const dropIndicator = this.$refs.dropIndicator;
-      if (dropType === "before") {
-        indicatorTop = iconPosition.top - treePosition.top;
-      } else if (dropType === "after") {
-        indicatorTop = iconPosition.bottom - treePosition.top;
+        .querySelector('.el-tree-node__expand-icon')
+        .getBoundingClientRect()
+      const dropIndicator = this.$refs.dropIndicator
+      if (dropType === 'before') {
+        indicatorTop = iconPosition.top - treePosition.top
+      } else if (dropType === 'after') {
+        indicatorTop = iconPosition.bottom - treePosition.top
       }
-      dropIndicator.style.top = indicatorTop + "px";
-      dropIndicator.style.left = iconPosition.right - treePosition.left + "px";
+      dropIndicator.style.top = indicatorTop + 'px'
+      dropIndicator.style.left = iconPosition.right - treePosition.left + 'px'
 
-      if (dropType === "inner") {
-        addClass(dropNode.$el, "is-drop-inner");
+      if (dropType === 'inner') {
+        addClass(dropNode.$el, 'is-drop-inner')
       } else {
-        removeClass(dropNode.$el, "is-drop-inner");
+        removeClass(dropNode.$el, 'is-drop-inner')
       }
 
       dragState.showDropIndicator =
-        dropType === "before" || dropType === "after";
-      dragState.allowDrop = dragState.showDropIndicator || userAllowDropInner;
-      dragState.dropType = dropType;
-      this.$emit("node-drag-over", draggingNode.node, dropNode.node, event);
-    });
+        dropType === 'before' || dropType === 'after'
+      dragState.allowDrop = dragState.showDropIndicator || userAllowDropInner
+      dragState.dropType = dropType
+      this.$emit('node-drag-over', draggingNode.node, dropNode.node, event)
+    })
 
-    this.$on("tree-node-drag-end", event => {
-      const { draggingNode, dropType, dropNode } = dragState;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
+    this.$on('tree-node-drag-end', event => {
+      const { draggingNode, dropType, dropNode } = dragState
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
 
       if (draggingNode && dropNode) {
-        const draggingNodeCopy = { data: draggingNode.node.data };
-        if (dropType !== "none") {
-          draggingNode.node.remove();
+        const draggingNodeCopy = { data: draggingNode.node.data }
+        if (dropType !== 'none') {
+          draggingNode.node.remove()
         }
-        if (dropType === "before") {
-          dropNode.node.parent.insertBefore(draggingNodeCopy, dropNode.node);
-        } else if (dropType === "after") {
-          dropNode.node.parent.insertAfter(draggingNodeCopy, dropNode.node);
-        } else if (dropType === "inner") {
-          dropNode.node.insertChild(draggingNodeCopy);
+        if (dropType === 'before') {
+          dropNode.node.parent.insertBefore(draggingNodeCopy, dropNode.node)
+        } else if (dropType === 'after') {
+          dropNode.node.parent.insertAfter(draggingNodeCopy, dropNode.node)
+        } else if (dropType === 'inner') {
+          dropNode.node.insertChild(draggingNodeCopy)
         }
-        if (dropType !== "none") {
-          this.store.registerNode(draggingNodeCopy);
+        if (dropType !== 'none') {
+          this.store.registerNode(draggingNodeCopy)
         }
 
-        removeClass(dropNode.$el, "is-drop-inner");
+        removeClass(dropNode.$el, 'is-drop-inner')
 
         this.$emit(
-          "node-drag-end",
+          'node-drag-end',
           draggingNode.node,
           dropNode.node,
           dropType,
           event
-        );
-        if (dropType !== "none") {
+        )
+        if (dropType !== 'none') {
           this.$emit(
-            "node-drop",
+            'node-drop',
             draggingNode.node,
             dropNode.node,
             dropType,
             event
-          );
+          )
         }
       }
       if (draggingNode && !dropNode) {
-        this.$emit("node-drag-end", draggingNode.node, null, dropType, event);
+        this.$emit('node-drag-end', draggingNode.node, null, dropType, event)
       }
 
-      dragState.showDropIndicator = false;
-      dragState.draggingNode = null;
-      dragState.dropNode = null;
-      dragState.allowDrop = true;
-    });
+      dragState.showDropIndicator = false
+      dragState.draggingNode = null
+      dragState.dropNode = null
+      dragState.allowDrop = true
+    })
   },
 
   mounted() {
-    this.initTabIndex();
-    this.$el.addEventListener("keydown", this.handleKeydown);
+    this.initTabIndex()
+    this.$el.addEventListener('keydown', this.handleKeydown)
   },
 
   updated() {
-    this.treeItems = this.$el.querySelectorAll("[role=treeitem]");
-    this.checkboxItems = this.$el.querySelectorAll("input[type=checkbox]");
+    this.treeItems = this.$el.querySelectorAll('[role=treeitem]')
+    this.checkboxItems = this.$el.querySelectorAll('input[type=checkbox]')
+  },
+
+  methods: {
+    changeWidth(e) {
+      const offsetWidth = +(this.offsetWidth.replace(/px/g, ''))
+      if (e > offsetWidth) {
+        this.offsetWidth = e + 34 + 'px'
+      }
+    },
+    smoothTree(treeData) {
+      return treeData.reduce((smoothArr, data) => {
+        if (data.visible) {
+          // Mark different types to avoid being optimized out when assembled into the same dom
+          data.type = this.showCheckbox
+            ? `${data.level}-${data.checked}-${data.indeterminate}`
+            : `${data.level}-${data.expanded}`
+          smoothArr.push(data)
+        }
+        if (data.expanded && data.childNodes.length) {
+          smoothArr.push(...this.smoothTree(data.childNodes))
+        }
+
+        return smoothArr
+      }, [])
+    },
+    filter(value) {
+      if (!this.filterNodeMethod) { throw new Error('[Tree] filterNodeMethod is required when filter') }
+      this.store.filter(value)
+    },
+
+    getNodeKey(node) {
+      return getNodeKey(this.nodeKey, node.data)
+    },
+
+    getNodePath(data) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in getNodePath') }
+      const node = this.store.getNode(data)
+      if (!node) return []
+      const path = [node.data]
+      let parent = node.parent
+      while (parent && parent !== this.root) {
+        path.push(parent.data)
+        parent = parent.parent
+      }
+      return path.reverse()
+    },
+
+    getCheckedNodes(leafOnly, includeHalfChecked) {
+      return this.store.getCheckedNodes(leafOnly, includeHalfChecked)
+    },
+
+    getCheckedKeys(leafOnly) {
+      return this.store.getCheckedKeys(leafOnly)
+    },
+
+    getCurrentNode() {
+      const currentNode = this.store.getCurrentNode()
+      return currentNode ? currentNode.data : null
+    },
+
+    getCurrentKey() {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in getCurrentKey') }
+      const currentNode = this.getCurrentNode()
+      return currentNode ? currentNode[this.nodeKey] : null
+    },
+
+    setCheckedNodes(nodes, leafOnly) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in setCheckedNodes') }
+      this.store.setCheckedNodes(nodes, leafOnly)
+    },
+
+    setCheckedKeys(keys, leafOnly) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in setCheckedKeys') }
+      this.store.setCheckedKeys(keys, leafOnly)
+    },
+
+    setChecked(data, checked, deep) {
+      this.store.setChecked(data, checked, deep)
+    },
+
+    setCheckedAll(checked = true) {
+      this.store.setCheckedAll(checked)
+    },
+
+    getHalfCheckedNodes() {
+      return this.store.getHalfCheckedNodes()
+    },
+
+    getHalfCheckedKeys() {
+      return this.store.getHalfCheckedKeys()
+    },
+
+    setCurrentNode(node) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in setCurrentNode') }
+      this.store.setUserCurrentNode(node)
+    },
+
+    setCurrentKey(key) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in setCurrentKey') }
+      this.store.setCurrentNodeKey(key)
+    },
+
+    getNode(data) {
+      return this.store.getNode(data)
+    },
+
+    remove(data) {
+      this.store.remove(data)
+    },
+
+    append(data, parentNode) {
+      this.store.append(data, parentNode)
+    },
+
+    insertBefore(data, refNode) {
+      this.store.insertBefore(data, refNode)
+    },
+
+    insertAfter(data, refNode) {
+      this.store.insertAfter(data, refNode)
+    },
+
+    handleNodeExpand(nodeData, node, instance) {
+      this.broadcast(this.treeNodeName, 'tree-node-expand', node)
+      this.$emit('node-expand', nodeData, node, instance)
+    },
+
+    updateKeyChildren(key, data) {
+      if (!this.nodeKey) { throw new Error('[Tree] nodeKey is required in updateKeyChild') }
+      this.store.updateChildren(key, data)
+    },
+
+    initTabIndex() {
+      this.treeItems = this.$el.querySelectorAll(
+        '.is-focusable[role=treeitem]'
+      )
+      this.checkboxItems = this.$el.querySelectorAll('input[type=checkbox]')
+      const checkedItem = this.$el.querySelectorAll(
+        '.is-checked[role=treeitem]'
+      )
+      if (checkedItem.length) {
+        checkedItem[0].setAttribute('tabindex', 0)
+        return
+      }
+      this.treeItems[0] && this.treeItems[0].setAttribute('tabindex', 0)
+    },
+
+    handleKeydown(ev) {
+      const currentItem = ev.target
+      if (currentItem.className.indexOf('el-tree-node') === -1) return
+      const keyCode = ev.keyCode
+      this.treeItems = this.$el.querySelectorAll(
+        '.is-focusable[role=treeitem]'
+      )
+      const currentIndex = this.treeItemArray.indexOf(currentItem)
+      let nextIndex
+      if ([38, 40].indexOf(keyCode) > -1) {
+        // up、down
+        ev.preventDefault()
+        if (keyCode === 38) {
+          // up
+          nextIndex = currentIndex !== 0 ? currentIndex - 1 : 0
+        } else {
+          nextIndex =
+            currentIndex < this.treeItemArray.length - 1 ? currentIndex + 1 : 0
+        }
+        this.treeItemArray[nextIndex].focus() // 选中
+      }
+      // 始终使用箭头，避免expand-on-click-node=false时不展开
+      const expandIcon = currentItem.querySelector('[class*="el-icon-"]')
+      if ([37, 39].indexOf(keyCode) > -1 && expandIcon) {
+        // left、right 展开
+        ev.preventDefault()
+        expandIcon.click() // 选中
+      }
+      const hasInput = currentItem.querySelector('[type="checkbox"]')
+      if ([13, 32].indexOf(keyCode) > -1 && hasInput) {
+        // space enter选中checkbox
+        ev.preventDefault()
+        hasInput.click()
+      }
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

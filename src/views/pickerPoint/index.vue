@@ -1,9 +1,19 @@
 <template>
   <div>
-    <choose-point :point.sync="point" :custom-style="customStyle" @success="success" @fail="fail" />
+    <choose-point
+      :point.sync="point"
+      :custom-style="customStyle"
+      @success="success"
+      @fail="fail"
+    />
 
     <template v-if="dialogProps.dialogShow">
-      <component :is="dialogProps.dialogName" :is-show.sync="dialogProps.dialogShow" :row-data="dialogProps.rowData" @handleSearch="handleSearch" />
+      <component
+        :is="dialogProps.dialogName"
+        :is-show.sync="dialogProps.dialogShow"
+        :row-data="dialogProps.rowData"
+        @handleSearch="handleSearch"
+      />
     </template>
 
   </div>
@@ -11,7 +21,7 @@
 <script>
 import ChoosePoint from '@/components/choosePoint'
 export default {
-  name: 'testChoosePoint',
+  name: 'TestChoosePoint',
   components: { ChoosePoint },
   data() {
     return {

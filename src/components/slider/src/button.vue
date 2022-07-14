@@ -23,7 +23,10 @@
       :disabled="!showTooltip"
     >
       <span slot="content">{{ formatValue }}</span>
-      <div class="el-slider__button" :class="{ 'hover': hovering, 'dragging': dragging }" />
+      <div
+        class="el-slider__button"
+        :class="{ 'hover': hovering, 'dragging': dragging }"
+      />
     </el-tooltip>
   </div>
 </template>

@@ -1,28 +1,46 @@
 <template>
-  <div v-mousewheel="timeLineMousewheel" class="timeLine">
+  <div
+    v-mousewheel="timeLineMousewheel"
+    class="timeLine"
+  >
     <el-scrollbar
-        ref="scrollbarRef"
-        :wrap-style="wrapStyle"
+      ref="scrollbarRef"
+      :wrap-style="wrapStyle"
     >
-      <div v-mousewheel="timeLineMousewheel" class="allLine" :style="[calcAllLineStyle]">
+      <div
+        v-mousewheel="timeLineMousewheel"
+        class="allLine"
+        :style="[calcAllLineStyle]"
+      >
 
         <template v-for="item in timeArr">
-          <div :key="item" class="item el-row--flex">
+          <div
+            :key="item"
+            class="item el-row--flex"
+          >
             <div class="minute el-row--flex">
               <template v-for="(son) in timeItemObj[item]">
                 <div
-                    :key="son.value"
-                    class="minute-item-box"
-                    :data-value="son.value"
-                    @click="timeLineClick(son)">
-                  <div class="offset" :style="[ calcOffsetStyle ]" />
+                  :key="son.value"
+                  class="minute-item-box"
+                  :data-value="son.value"
+                  @click="timeLineClick(son)"
+                >
+                  <div
+                    class="offset"
+                    :style="[ calcOffsetStyle ]"
+                  />
                   <div class="fill" />
                   <div
-                      :key="son.value"
-                      class="minute-item"
-                      :style="calcMinuteItemStyle(son)"
+                    :key="son.value"
+                    class="minute-item"
+                    :style="calcMinuteItemStyle(son)"
                   >
-                    <div v-if="valueIndexObj[son.value].index % 60 === 0" class="hours" @click.stop="() => {}">{{ valueIndexObj[son.value].h }}h</div>
+                    <div
+                      v-if="valueIndexObj[son.value].index % 60 === 0"
+                      class="hours"
+                      @click.stop="() => {}"
+                    >{{ valueIndexObj[son.value].h }}h</div>
                   </div>
 
                   <div class="hover-item">{{ son.value }}</div>
@@ -38,7 +56,7 @@
 <script>
 import Mousewheel from 'element-ui/lib/directives/mousewheel'
 export default {
-  name: 'timeLine',
+  name: 'TimeLine',
   directives: {
     Mousewheel
   },
@@ -71,9 +89,9 @@ export default {
           width: lineWidth + 'px',
           height: index % 60 === 0 ? '14px' : '8px',
           background: (currentIndex > index && index % 6 === 0)
-              ? '#45e0ff' : index % 60 === 0
-                  ? '#8e8e8e' : index % 6 === 0
-                      ? '#8e8e8e' : 'transparent',
+            ? '#45e0ff' : index % 60 === 0
+              ? '#8e8e8e' : index % 6 === 0
+                ? '#8e8e8e' : 'transparent',
           cursor: 'pointer',
           alignSelf: 'flex-end',
           color: currentIndex > index ? '#06a9ff' : '#9b9b9b'

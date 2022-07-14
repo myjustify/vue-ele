@@ -64,7 +64,8 @@
         </div>
         <div class="el-slider__marks">
           <slider-marker
-            v-for="(item, key) in markList" :key="key"
+            v-for="(item, key) in markList"
+            :key="key"
             :mark="item.mark"
             :style="getStopStyle(item.position)"
           />

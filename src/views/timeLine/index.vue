@@ -1,13 +1,13 @@
 <template>
   <div style="width: 100%;">
-    <time-line v-model="time"></time-line>
+    <time-line v-model="time" />
   </div>
 </template>
 <script>
 import TimeLine from '@/views/timeLine/timeLine'
 export default {
-  name: 'time-line-view',
-  components: {TimeLine},
+  name: 'TimeLineView',
+  components: { TimeLine },
   data() {
     return {
       time: '00:00'
