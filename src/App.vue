@@ -22,13 +22,13 @@ import { routes } from '@/router'
 import extName from 'ext-name'
 const urls = [
     'http://adas.wbtech.com/file//data/alarmFile/dailyVideo/20220626/50674/192180671993_01_22062610.ts.mp4',
-    'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni4934e7b/c4d93960-5643-11eb-a16f-5b3e54966275.m3u8',
+    'http://0f0fb3b075c8899be7443c7b9fd0430e.cloud.xstrive.com:9502/vod/index.m3u8?command=record&channel=record1&start_time=1657641600000&end_time=1657727999999',
     'https://live.cloud.xstrive.com/hdl/_liveXsw_1/4c684e2a202e5203b0b31a57e0b0f6de.flv',
     'ws://47.103.153.132:4022/ws?port=10077&app=live&stream=03177574659_channel_4_playback'
 ]
 
 urls.forEach(item => {
-  const result = extName(item)
+  const result = extName(item.split('?').filter(Boolean)[0])
   if(item.startsWith('ws')) {
     console.log({
       type: 'ws-flv',

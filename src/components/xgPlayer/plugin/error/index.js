@@ -18,7 +18,7 @@ const y_error = function() {
   }
   let refresh = null
 
-  function onError() {
+  function onError(flag) {
     // player.controls.style.display = 'none'
     // if (player.error) {
     //   text.innerHTML = player.error
@@ -27,19 +27,19 @@ const y_error = function() {
     // }
     addClass(player.root, 'xgplayer-is-error')
     refresh = error.querySelector('.xgplayer-error-refresh')
-    if (refresh) {
+    if (refresh && flag) {
       ['touchend', 'click'].forEach(item => {
         refresh.addEventListener(item, function(e) {
           e.preventDefault()
           e.stopPropagation()
           player.autoplay = true
           removeClass(player.root, 'xgplayer-is-error')
-          addClass(player.root, 'xgplayer-is-loading')
+          // addClass(player.root, 'xgplayer-is-loading')
           const currentTime = player.currentTime
-          player.emit('timeoutPlugin')
+          player.emit('timeoutPlugin', false)
           player.once('playing', () => {
             player.currentTime = currentTime
-            removeClass(player.root, 'xgplayer-is-loading')
+            // removeClass(player.root, 'xgplayer-is-loading')
           })
           player.src = player.config.url
         })

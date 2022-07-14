@@ -1,7 +1,7 @@
 <template>
   <div
-    :class="[ comName ]"
-    :style="{ width: '100%', height: '100%', ...customStyle }"
+      :class="[ comName ]"
+      :style="{ width: '100%', height: '100%', ...customStyle }"
   >
     <div ref="xgRef" />
   </div>
@@ -11,14 +11,13 @@
 import xgPlayer from 'xgplayer'
 import HlsPlayer from 'xgplayer-hls'
 import FlvJsPlayer from 'xgplayer-flv.js'
-import FlvPlayer from 'xgplayer-flv'
 import errorPlugin from '@/components/xgPlayer/plugin/error'
 import { timeoutPlugin } from '@/components/xgPlayer/plugin/timeoutPlugin'
 import { getVideoType } from '@/components/xgPlayer/util'
 const players = {
   mp4: xgPlayer,
   m3u8: HlsPlayer,
-  flv: FlvPlayer,
+  flv: FlvJsPlayer,
   'ws-flv': FlvJsPlayer
 }
 const configs = {
@@ -75,10 +74,11 @@ export default {
   methods: {
     init() {
       this.unload()
+      if (!this.videoObj.playUrl) return
       const { type } = getVideoType(this.videoObj.playUrl)
-      const xgPlayer = players[type]
+      const XgPlayer = players[type]
       const p = this.getOptions(this.videoObj, type)
-      this.player = new xgPlayer({
+      this.player = new XgPlayer({
         el: this.$refs.xgRef,
         ignores: ['error'],
         ...p
@@ -97,11 +97,11 @@ export default {
         autoplay = true,
         loop = false,
         flvOptionalConfig = {},
-        options = {}
+        ...options
       } = videoObj
       const result = {
         fluid: true,
-        playbackRate: [0.5, 0.75, 1, 1.5, 2],
+        playbackRate: [0.25, 0.5, 0.75, 1, 1.5, 2],
         defaultPlaybackRate: 1,
         timeoutNums: 10000,
         playsinline: true,
@@ -134,5 +134,11 @@ export default {
 
 <style lang="scss" scoped>
 $name: '.xgPlayer';
-#{$name}{}
+#{$name}{
+  ::v-deep .xgplayer {
+    width: 100%;
+    height: 100% !important;
+    padding-top: 0 !important;
+  }
+}
 </style>

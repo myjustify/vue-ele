@@ -2,7 +2,15 @@
 import extName from 'ext-name'
 
 export function getVideoType(playUrl) {
-  const result = extName(playUrl)
+  const res = playUrl.split('?').filter(Boolean)[0]
+  if (res.endsWith('/flv')) {
+    return {
+      type: 'flv',
+      ext: '',
+      mime: 'video/x-flv'
+    }
+  }
+  const result = extName(res)
   if (playUrl.startsWith('ws')) {
     return {
       type: 'ws-flv',
