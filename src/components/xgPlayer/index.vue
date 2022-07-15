@@ -1,7 +1,7 @@
 <template>
   <div
-    :class="[ comName ]"
-    :style="{ width: '100%', height: '100%', ...customStyle }"
+      :class="[ comName ]"
+      :style="{ width: '100%', height: '100%', ...customStyle }"
   >
     <div ref="xgRef" />
   </div>
@@ -35,7 +35,7 @@ xgPlayer.install(timeoutPlugin.name, timeoutPlugin.method)
 xgPlayer.install(errorPlugin.name, errorPlugin.method)
 
 export default {
-  name: 'XgPlayer',
+  name: 'xgPlayer',
   props: {
     customStyle: {
       type: Object,
@@ -55,9 +55,7 @@ export default {
   watch: {
     'videoObj.playUrl': {
       handler(value) {
-        console.log(value)
         if (value) {
-          this.unload()
           this.init()
         } else {
           this.unload()
@@ -72,20 +70,29 @@ export default {
     this.unload()
   },
   methods: {
+    play() {
+      this.player && this.player.play()
+    },
+    pause() {
+      this.player && this.player.pause()
+    },
     init() {
       this.unload()
       if (!this.videoObj.playUrl) return
-      const { type } = getVideoType(this.videoObj.playUrl)
-      const XgPlayer = players[type]
-      const p = this.getOptions(this.videoObj, type)
-      this.player = new XgPlayer({
-        el: this.$refs.xgRef,
-        ignores: ['error'],
-        ...p
+      setTimeout(() => {
+        const { type } = getVideoType(this.videoObj.playUrl)
+        const XgPlayer = players[type]
+        const p = this.getOptions(this.videoObj, type)
+        this.player = new XgPlayer({
+          el: this.$refs.xgRef,
+          ignores: ['error'],
+          ...p
+        })
       })
     },
     unload() {
       if (this.player) {
+        this.player.emit('destroy')
         this.player.destroy()
         this.player = null
       }
@@ -126,6 +133,7 @@ export default {
       isLive && (Object.assign(result, configs.isLive))
       autoplay && (Object.assign(result, configs.autoplay))
       loop && (Object.assign(result, configs.loop))
+      console.log('xgplayer 配置', result)
       return result
     }
   }
@@ -134,7 +142,7 @@ export default {
 
 <style lang="scss" scoped>
 $name: '.xgPlayer';
-#{$name}{
+#{ $name } {
   ::v-deep .xgplayer {
     width: 100%;
     height: 100% !important;

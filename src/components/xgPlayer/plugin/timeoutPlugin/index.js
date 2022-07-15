@@ -47,8 +47,10 @@ export const timeoutPlugin = {
     player.on('timeoutPlugin', waitingFn2)
 
     function destroyFunc() {
+      console.log('destroyFunc')
       clearSto()
       player.off('timeoutPlugin', waitingFn2)
+      player.off('destroy', destroyFunc)
     }
 
     function clearSto() {
@@ -58,6 +60,6 @@ export const timeoutPlugin = {
         timeoutId = null
       }
     }
-    player.once('destroy', destroyFunc)
+    player.on('destroy', destroyFunc)
   }
 }
